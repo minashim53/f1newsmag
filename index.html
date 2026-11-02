@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>F1NEWS 에프원뉴스</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap">
+<style>
+/* Layout concept: broadcast timing-tower magazine. Black gantry hero, quiet dark sections, green for action, red only for signal. */
+:root{
+  --bg:#15151E; --bg-deep:#000000; --surface:#1E1E2B; --surface-2:#282838;
+  --line:rgba(241,242,246,.13); --fg:#F1F2F6; --fg-dim:#B7BACB; --fg-faint:#8B8FA3;
+  --primary:#5B8266; --primary-hi:#86AD91; --on-primary:#000000;
+  --accent:#E00800; --accent-text:#FF6F67; --on-accent:#F8F8FB;
+  --flag-y:#FFD21F; --lap-purple:#A66BFF;
+  --f-display:"Big Shoulders Display","Noto Sans KR",system-ui,sans-serif;
+  --f-body:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --radius:20px; --shadow:0 8px 26px rgba(0,0,0,.16);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:17px;line-height:1.7;-webkit-text-size-adjust:100%;word-break:keep-all;overflow-wrap:break-word}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg-deep);z-index:60}
+a{color:var(--primary-hi);text-underline-offset:3px}
+b,strong{font-weight:700}
+small{font-size:.875rem;color:var(--fg-dim)}
+:focus-visible{outline:3px solid var(--primary-hi);outline-offset:3px;border-radius:6px}
+.in{max-width:1160px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+.ic{width:28px;height:28px;flex:none}
+.medal{font-size:1.2em;margin-right:.3em;line-height:1}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:-999px;top:8px;background:var(--primary);color:var(--on-primary);padding:12px 18px;border-radius:12px;font-weight:800;z-index:100}
+.skip:focus{left:16px}
+
+/* masthead */
+.mast{background:var(--bg-deep)}
+.mast .in{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;padding-block:18px 14px}
+.brand{display:flex;align-items:baseline;gap:12px;text-decoration:none;color:var(--fg)}
+.brand .wm{font-family:var(--f-display);font-weight:900;font-size:2.4rem;letter-spacing:.02em;line-height:1}
+.brand .wm span{color:var(--accent-text)}
+.brand .kr{font-weight:700;color:var(--fg-dim);font-size:.95rem}
+.mast .stamp{font-size:.9rem;color:var(--fg-dim);display:flex;gap:8px 16px;flex-wrap:wrap}
+.mast .stamp b{color:var(--fg)}
+
+/* sticky nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--bg-deep);border-bottom:1px solid var(--line)}
+.nav .scroller{display:flex;gap:12px;overflow-x:auto;padding-block:10px 12px;scrollbar-width:none}
+.nav .scroller::-webkit-scrollbar{display:none}
+.nav a{flex:none;display:inline-flex;align-items:center;min-height:48px;padding:0 22px;border-radius:999px;border:1px solid var(--line);color:var(--fg);text-decoration:none;font-weight:700;font-size:1rem}
+.nav a[aria-current="true"]{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+
+/* hero */
+.hero{background:var(--bg-deep);padding-block:8px 56px}
+.hero .grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:40px 48px;align-items:start}
+.lights{display:inline-flex;gap:8px;margin-bottom:20px}
+.lights i{width:14px;height:14px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px rgba(224,8,0,.18)}
+.tag{display:inline-flex;align-items:center;gap:8px;min-height:32px;padding:0 14px;border-radius:999px;font-size:.9rem;font-weight:800;letter-spacing:.02em}
+.tag.red{background:var(--accent);color:var(--on-accent)}
+.tag.line{border:1px solid var(--line);color:var(--fg-dim);font-weight:500}
+.tags{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+.hero h1{font-size:clamp(2.1rem,5.6vw,3.9rem);font-weight:900;line-height:1.16;margin:0 0 20px;text-wrap:balance;letter-spacing:-.01em}
+.mega{display:flex;align-items:baseline;flex-wrap:wrap;gap:0 6px;font-family:var(--f-display);font-weight:900;line-height:.86;color:var(--fg)}
+.mega .n{font-size:clamp(5.5rem,17vw,11rem);letter-spacing:-.01em}
+.mega .u{font-family:var(--f-body);font-size:clamp(1.5rem,3.4vw,2.2rem);font-weight:800;margin-right:18px;color:var(--fg-dim)}
+.mega-cap{border-top:3px solid var(--accent);padding-top:12px;margin:14px 0 26px;max-width:34rem;color:var(--fg-dim);font-size:1rem}
+.mega-cap b{color:var(--fg)}
+.prose p{margin:0 0 1.1em;max-width:40rem;font-size:1.0625rem}
+.facts{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0 0;padding:0;list-style:none}
+.facts li{border:1px solid var(--line);border-radius:14px;padding:10px 16px;font-size:.95rem;color:var(--fg-dim)}
+.facts li b{color:var(--fg);display:block;font-size:1rem}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+.card h3{margin:0;font-size:1.15rem;line-height:1.4}
+.card p{margin:0}
+.podium-card h2{font-size:1.2rem;margin:0 0 4px}
+.podium-card .meta{color:var(--fg-dim);font-size:.95rem;margin-bottom:12px}
+
+.pods{display:grid;gap:4px;margin-top:14px}
+.pod{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;padding:10px 0;border-top:1px solid var(--line)}
+.pod:first-child{border-top:0}
+.pod .rk{flex:0 0 5.2em;font-weight:800;font-size:.98rem;white-space:nowrap}
+.pod .who{flex:1 1 9em;min-width:0}
+.pod .who em{font-style:normal;font-family:var(--f-mono);font-size:.82rem;color:var(--fg-faint);margin-left:4px}
+.pod .tm{font-family:var(--f-mono);font-size:.92rem;color:var(--fg-dim);font-variant-numeric:tabular-nums;margin-left:auto}
+.evt{display:flex;align-items:center;gap:12px;margin-top:14px !important;padding:12px 14px;border-radius:14px;background:var(--surface-2);font-size:.95rem;color:var(--fg-dim)}
+.evt b{color:var(--fg)}
+.evt.plain{background:none;padding:0;font-size:.85rem;color:var(--fg-faint)}
+.notes{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:12px}
+
+/* stat band */
+.band{border-bottom:1px solid var(--line)}
+.band .in{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+.band .st{padding:22px 16px;border-left:1px solid var(--line)}
+.band .st:first-child{border-left:0;padding-left:0}
+.band .v{font-family:var(--f-display);font-weight:900;font-size:2.8rem;line-height:1;font-variant-numeric:tabular-nums}
+.band .v em{font-style:normal;font-size:1.5rem;color:var(--fg-faint);font-weight:700}
+.band .l{font-size:.9rem;color:var(--fg-dim);margin-top:6px;line-height:1.4}
+
+/* sections */
+section.sec{padding-block:64px 8px}
+.sec-h{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 24px;margin-bottom:28px}
+.eyebrow{font-family:var(--f-display);font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:.95rem;color:var(--primary-hi);display:block;margin-bottom:4px}
+.sec-h h2{margin:0;font-size:clamp(1.6rem,3.6vw,2.3rem);font-weight:900;line-height:1.2;text-wrap:balance}
+.sec-h p{margin:0;max-width:30rem;color:var(--fg-dim);font-size:.98rem}
+.sec{scroll-margin-top:96px}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:20px}
+.news .kicker{font-size:.85rem;font-weight:800;letter-spacing:.04em;color:var(--primary-hi);margin-bottom:8px;display:block}
+.news h3{font-size:1.2rem;line-height:1.4;margin-bottom:10px;text-wrap:balance}
+.news p{color:var(--fg-dim);font-size:1rem}
+.news .by{margin-top:14px;font-size:.85rem;color:var(--fg-faint)}
+
+/* tabs & chips */
+.tabs{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.tab,.chip{min-height:48px;padding:0 24px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--fg);font:700 1rem/1 var(--f-body);cursor:pointer}
+.chip{padding:0 20px;font-weight:500}
+.tab[aria-selected="true"],.chip[aria-pressed="true"]{background:var(--primary);border-color:var(--primary);color:var(--on-primary);font-weight:800}
+.chips{display:flex;flex-wrap:wrap;gap:12px 14px;margin-bottom:24px}
+
+.notice{display:flex;gap:14px;align-items:flex-start;border:1px solid var(--line);border-left:4px solid var(--flag-y);border-radius:14px;padding:14px 18px;margin-bottom:22px;background:var(--surface);font-size:.95rem;color:var(--fg-dim)}
+.notice b{color:var(--fg)}
+.notice .ic{margin-top:2px}
+
+.tbl{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.tbl .scroll{overflow-x:auto}
+table.board{width:100%;border-collapse:collapse;min-width:0}
+table.board caption{text-align:left;padding:16px 20px;color:var(--fg-dim);font-size:.9rem;border-bottom:1px solid var(--line)}
+table.board th,table.board td{padding:14px 12px;text-align:left;vertical-align:middle;border-top:1px solid var(--line)}
+table.board thead th{border-top:0;font-size:.85rem;color:var(--fg-faint);font-weight:700;letter-spacing:.04em;padding-block:12px}
+table.board tr:first-child th,table.board tr:first-child td{border-top:0}
+table.board th:first-child,table.board td:first-child{padding-left:20px}
+table.board th:last-child,table.board td:last-child{padding-right:20px}
+.pos{white-space:nowrap;font-weight:800;width:5.6em;font-variant-numeric:tabular-nums}
+.who b{font-size:1.05rem}
+.who small{display:block;margin-top:2px}
+.code{font-family:var(--f-mono);font-size:.8rem;color:var(--fg-faint);margin-left:2px}
+.gap{font-family:var(--f-mono);font-size:.92rem;color:var(--fg-dim);white-space:nowrap;font-variant-numeric:tabular-nums}
+.pts{min-width:7.5em}
+.pts .n{font-family:var(--f-mono);font-weight:600;font-size:1.1rem;font-variant-numeric:tabular-nums;display:block;text-align:right}
+.bar{display:block;height:6px;border-radius:3px;background:var(--surface-2);position:relative;margin-top:6px;overflow:hidden}
+.bar::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--w);background:var(--primary);border-radius:3px}
+.row.top3 .pos{color:var(--fg)}
+.row.top3 .bar::after{background:var(--primary-hi)}
+
+/* wins chart */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.8fr);gap:28px 36px;align-items:start;margin-bottom:36px}
+.wins{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.wins li{display:grid;grid-template-columns:minmax(7.5em,9.5em) minmax(0,1fr) 3em;align-items:center;gap:12px}
+.wins .nm b{display:block;line-height:1.3}
+.wins .nm small{display:block;font-size:.8rem;line-height:1.3}
+.wins .track{height:14px;border-radius:7px;background:var(--surface-2);overflow:hidden}
+.wins .track i{display:block;height:100%;width:var(--w);background:var(--primary);border-radius:7px}
+.wins li:first-child .track i{background:var(--primary-hi)}
+.wins .ct{font-family:var(--f-mono);font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.rec h3{font-size:1.1rem;margin:0 0 10px}
+.rec p{color:var(--fg-dim);font-size:1rem;max-width:36rem}
+
+.race header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.race .rd{font-family:var(--f-display);font-weight:900;font-size:1.5rem;letter-spacing:.04em;color:var(--primary-hi)}
+.race .dt{font-size:.9rem;color:var(--fg-dim)}
+.race .sub{color:var(--fg-faint);font-size:.9rem}
+
+/* schedule */
+.next{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:28px 40px;padding:28px;margin-bottom:24px;border-color:rgba(91,130,102,.55)}
+.next h3{font-size:1.7rem;font-weight:900;margin:8px 0 4px}
+.dday{font-family:var(--f-display);font-weight:900;font-size:4.2rem;line-height:1;color:var(--fg)}
+.dday small{font-family:var(--f-body);font-size:1rem;font-weight:500;margin-left:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 26px;border-radius:999px;background:var(--primary);color:var(--on-primary);font-weight:800;font-size:1.05rem;text-decoration:none;border:0}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.btn-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:20px}
+.up{display:flex;flex-direction:column;gap:6px}
+.up .rd{font-family:var(--f-display);font-weight:900;font-size:1.3rem;color:var(--primary-hi);letter-spacing:.04em}
+.up .dts{font-family:var(--f-mono);font-weight:600;font-size:1.05rem}
+.guide{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:16px}
+.sess{padding:18px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.sess h4{margin:0;font-size:1.05rem}
+.sess .en{display:block;font-size:.8rem;color:var(--fg-faint);letter-spacing:.04em;margin:2px 0 8px}
+.sess p{margin:0;font-size:.95rem;color:var(--fg-dim);line-height:1.6}
+.sess .wk{display:inline-block;margin-top:10px;font-size:.8rem;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--fg-dim)}
+.sub-h{font-size:1.2rem;margin:40px 0 6px}
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:14px;list-style:none;padding:0;margin:16px 0 0}
+.legend li{display:flex;gap:14px;align-items:flex-start;padding:16px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.legend b{display:block}
+.legend span{font-size:.92rem;color:var(--fg-dim);line-height:1.5}
+
+/* korea */
+.kfeature{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:24px 40px;padding:28px;margin-bottom:20px}
+.kfeature h3{font-size:1.5rem;font-weight:900;line-height:1.35;margin:8px 0 12px;text-wrap:balance}
+.kfeature p{color:var(--fg-dim)}
+.kpoints{list-style:none;margin:0;padding:0;display:grid;gap:12px;align-content:start}
+.kpoints li{padding:14px 16px;border-radius:14px;background:var(--surface-2);font-size:.95rem;color:var(--fg-dim)}
+.kpoints b{display:block;color:var(--fg);font-size:1.02rem}
+.rounds{width:100%;border-collapse:collapse}
+.rounds th,.rounds td{padding:14px 12px;text-align:left;border-top:1px solid var(--line);vertical-align:top}
+.rounds thead th{border-top:0;font-size:.85rem;color:var(--fg-faint)}
+.rounds td:first-child,.rounds th:first-child{padding-left:20px}
+.rounds .rr{font-family:var(--f-display);font-weight:900;font-size:1.25rem;color:var(--primary-hi);white-space:nowrap}
+.rounds .dd{white-space:nowrap;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font-size:.8rem;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--fg-dim);white-space:nowrap}
+.pill.done{border-color:rgba(134,173,145,.5);color:var(--primary-hi)}
+.srcs{margin-top:20px;font-size:.9rem;color:var(--fg-faint)}
+.srcs a{display:inline-block;margin:4px 14px 4px 0}
+
+/* shop */
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:20px}
+.shop h3{font-size:1.3rem;margin:6px 0 8px}
+.shop .dom{font-family:var(--f-mono);font-size:.85rem;color:var(--fg-faint)}
+.shop p{color:var(--fg-dim);margin-bottom:18px}
+.shop .card{display:flex;flex-direction:column}
+.shop .card .btn{margin-top:auto;align-self:flex-start}
+.check{margin:28px 0 0;padding:24px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--line)}
+.check h3{margin:0 0 12px;font-size:1.15rem}
+.check ul{margin:0;padding-left:1.2em;display:grid;gap:10px;color:var(--fg-dim)}
+.check li b{color:var(--fg)}
+.more{display:flex;flex-wrap:wrap;gap:14px;margin-top:22px}
+
+/* archive */
+.arch-split{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px 40px;align-items:start}
+.yr{font-family:var(--f-display);font-weight:900;font-size:1.4rem;width:4.2em;font-variant-numeric:tabular-nums}
+.tm2{color:var(--fg-dim);text-align:right}
+.flash{display:grid;gap:16px}
+.flash .card{padding:20px}
+.flash .y{font-family:var(--f-display);font-weight:900;font-size:1.7rem;color:var(--primary-hi);line-height:1}
+.flash h3{margin:6px 0 8px;font-size:1.1rem}
+.flash p{color:var(--fg-dim);font-size:.98rem}
+
+/* footer */
+footer{margin-top:80px;background:var(--bg-deep);padding-block:44px 56px;color:var(--fg-dim);font-size:.92rem}
+footer .cols{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:28px 48px}
+footer h2{font-size:1rem;color:var(--fg);margin:0 0 10px}
+footer ul{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+footer a{color:var(--primary-hi)}
+footer .legal{margin-top:28px;padding-top:20px;border-top:1px solid var(--line);font-size:.85rem;color:var(--fg-faint)}
+
+@media (max-width:960px){
+  .hero .grid,.next,.kfeature,.arch-split,.split,footer .cols{grid-template-columns:minmax(0,1fr)}
+  .band .in{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .band .st:nth-child(odd){border-left:0;padding-left:0}
+  .band .st:nth-child(n+3){border-top:1px solid var(--line)}
+}
+@media (max-width:640px){
+  body{font-size:17px}
+  section.sec{padding-block:48px 0}
+  .card{padding:18px}
+  .next,.kfeature{padding:20px}
+  .gap,.th-gap{display:none}
+  table.board th,table.board td{padding:14px 8px}
+  .wins li{grid-template-columns:minmax(0,1fr) 3em;grid-template-areas:"nm ct" "tr tr"}
+  .wins .nm{grid-area:nm}.wins .ct{grid-area:ct}.wins .track{grid-area:tr}
+  .rounds thead{display:none}
+  .rounds tr{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 14px;padding:14px 18px;border-top:1px solid var(--line)}
+  .rounds tr:first-child{border-top:0}
+  .rounds td,.rounds th{border:0;padding:0 !important}
+  .rounds .rr{grid-row:span 3}
+  .dday{font-size:3.4rem}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+html{background:#15151E}body{margin:0}[hidden]{display:none!important}img{max-width:100%}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+ <symbol id="i-yellow" viewBox="0 0 24 24"><path d="M5 3v18" stroke="#B7BACB" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M6 4c3-1.6 5 1.6 8 0s4 .6 5 0v9c-1 .6-2-.6-5 0s-5-1.6-8 0z" fill="#FFD21F"/></symbol>
+ <symbol id="i-red" viewBox="0 0 24 24"><path d="M5 3v18" stroke="#B7BACB" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M6 4c3-1.6 5 1.6 8 0s4 .6 5 0v9c-1 .6-2-.6-5 0s-5-1.6-8 0z" fill="#E00800"/></symbol>
+ <symbol id="i-chq" viewBox="0 0 24 24"><path d="M4 3v18" stroke="#B7BACB" stroke-width="2" stroke-linecap="round" fill="none"/><rect x="6" y="4" width="14" height="10" fill="#F1F2F6"/><g fill="#15151E"><rect x="6" y="4" width="3.5" height="3.33"/><rect x="13" y="4" width="3.5" height="3.33"/><rect x="9.5" y="7.33" width="3.5" height="3.33"/><rect x="16.5" y="7.33" width="3.5" height="3.33"/><rect x="6" y="10.67" width="3.5" height="3.33"/><rect x="13" y="10.67" width="3.5" height="3.33"/></g></symbol>
+ <symbol id="i-fl" viewBox="0 0 24 24"><rect x="10" y="1.5" width="4" height="3" rx="1" fill="#A66BFF"/><circle cx="12" cy="14" r="8.5" fill="#A66BFF"/><path d="M12 14V8.5M12 14l4 2.2" stroke="#15151E" stroke-width="2" stroke-linecap="round" fill="none"/></symbol>
+ <symbol id="i-sc" viewBox="0 0 24 24"><rect x="1.5" y="5" width="21" height="14" rx="3.5" fill="#FFD21F"/><text x="12" y="15.6" text-anchor="middle" font-family="Big Shoulders Display, sans-serif" font-weight="900" font-size="10" fill="#000">SC</text></symbol>
+</svg>
+
+<a class="skip" href="#news">본문으로 건너뛰기</a>
+
+<header class="mast">
+  <div class="in">
+    <a class="brand" href="#news" aria-label="F1NEWS 에프원뉴스 홈"><span class="wm">F1<span>NEWS</span></span><span class="kr">에프원뉴스</span></a>
+    <p class="stamp" style="margin:0"><span><b>2026.11.02 월</b> 기준</span><span>R19 멕시코시티 종료 · 다음 R20 상파울루</span></p>
+  </div>
+</header>
+<nav class="nav" aria-label="섹션 이동">
+  <div class="in"><div class="scroller">
+    <a href="#news">뉴스</a><a href="#standings">순위</a><a href="#results">경기 결과</a><a href="#schedule">일정·세션</a><a href="#korea">한국 레이싱</a><a href="#shop">공식 굿즈</a><a href="#archive">아카이브</a>
+  </div></div>
+</nav>
+
+<main>
+<section class="hero" id="news" aria-labelledby="h-cover">
+  <div class="in">
+    <div class="grid">
+      <div>
+        <div class="lights" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="tags"><span class="tag red">커버스토리</span><span class="tag line">11월 1일 · 멕시코시티</span></div>
+        <h1 id="h-cover">안토넬리, 역대 최연소 F1 월드 챔피언에 오르다</h1>
+        <div class="mega" aria-label="20세 68일"><span class="n">20</span><span class="u">세</span><span class="n">68</span><span class="u">일</span></div>
+        <p class="mega-cap"><b>역대 최연소 월드 챔피언.</b> 종전 기록은 2010년 제바스티안 페텔의 23세 134일이었다.</p>
+        <div class="prose">
+          <p>메르세데스의 키미 안토넬리가 멕시코시티 그랑프리에서 3위로 결승선을 통과하며 2026 드라이버즈 타이틀을 확정했다. 레이스 전 2위 러셀과의 격차가 123점이었고, 9위 안에만 들면 우승이 결정되는 상황이었다.</p>
+          <p>이탈리아 선수로는 1953년 알베르토 아스카리 이후 처음이고, F1 역사상 36번째 월드 챔피언이다. 안토넬리는 올 시즌 19경기 중 9경기에서 우승했다.</p>
+        </div>
+        <ul class="facts">
+          <li><b>9승</b>2026 시즌 우승</li>
+          <li><b>1953년 이후</b>첫 이탈리아 챔피언</li>
+          <li><b>36번째</b>역대 월드 챔피언</li>
+        </ul>
+      </div>
+
+      <aside class="card podium-card" aria-labelledby="h-mex">
+        <span class="tag red" style="margin-bottom:12px">R19 · 최신 결과</span>
+        <h2 id="h-mex">멕시코시티 그랑프리</h2>
+        <p class="meta">11월 1일 · 71랩 · 결승 기준</p>
+        <div class="pods">
+          <div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>맥스 페르스타펜</b> <em>VER</em><small style="display:block">레드불 레이싱</small></span><span class="tm">2:20:28.772</span></div>
+          <div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>루이스 해밀턴</b> <em>HAM</em><small style="display:block">페라리</small></span><span class="tm">+0.799</span></div>
+          <div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>키미 안토넬리</b> <em>ANT</em><small style="display:block">메르세데스</small></span><span class="tm">+4.006</span></div>
+        </div>
+        <ul class="notes">
+          <li class="evt"><svg class="ic" aria-hidden="true"><use href="#i-sc"/></svg><span><b>세이프티 카</b> 59랩, 피아스트리와 린드블라드의 접촉으로 투입</span></li>
+          <li class="evt"><span><b>알핀 포인트 박탈</b> 알핀 두 드라이버는 페널티로 이 경기 포인트를 받지 못했다(F1.com 보도)</span></li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<div class="band" aria-label="시즌 요약">
+  <div class="in">
+    <div class="st"><div class="v">19<em>/23</em></div><div class="l">종료된 라운드</div></div>
+    <div class="st"><div class="v">6<em>명</em></div><div class="l">그랑프리 우승자 (19경기)</div></div>
+    <div class="st"><div class="v">12<em>/19</em></div><div class="l">메르세데스 우승 횟수</div></div>
+    <div class="st"><div class="v">4<em>경기</em></div><div class="l">남은 라운드, 12월 6일 종료 예정</div></div>
+  </div>
+</div>
+
+<section class="sec" aria-labelledby="h-more">
+  <div class="in">
+    <div class="sec-h"><div><span class="eyebrow">Features</span><h2 id="h-more">이번 시즌 읽을거리</h2></div><p>공식 결과 기록을 바탕으로 정리한 시즌 분석입니다.</p></div>
+    <div class="cards news">
+      <article class="card"><span class="kicker">시즌 분석 · R02–R18</span><h3>안토넬리의 9승, 5연승에서 시작됐다</h3><p>중국에서 모나코까지 2라운드부터 6라운드까지 5연승을 쌓았고, 이후 벨기에·이탈리아·스페인·미국을 더해 9승을 채웠다. 같은 팀 러셀은 호주·오스트리아·아제르바이잔에서 3승을 거뒀다.</p><p class="by">출처: formula1.com 레이스 결과</p></article>
+      <article class="card"><span class="kicker">드라이버 · 노리스</span><h3>디펜딩 챔피언의 2026은 6위</h3><p>2025 챔피언 랜도 노리스는 헝가리와 네덜란드에서 2승을 올렸지만 공식 드라이버 순위 페이지 기준 6위(211점)에 머물렀다. 시즌 타이틀 방어는 안토넬리가 가져갔다.</p><p class="by">출처: formula1.com 순위·결과</p></article>
+      <article class="card"><span class="kicker">드라이버 · 해밀턴</span><h3>해밀턴이 바르셀로나에서 올 시즌 유일한 우승</h3><p>6월 14일 바르셀로나-카탈루냐 그랑프리에서 우승했다. 중국·캐나다·모나코·영국·바레인에서 포디엄에 올랐고, 멕시코에서도 2위로 마쳤다.</p><p class="by">출처: formula1.com 레이스 결과</p></article>
+      <article class="card"><span class="kicker">드라이버 · 페르스타펜</span><h3>타이틀은 멀어졌어도 최근 4경기 3승</h3><p>미국 그랑프리 직후 수학적으로 타이틀 경쟁에서 탈락했지만, 10월 이후 바레인·싱가포르·멕시코를 이겼다. 멕시코에서는 해밀턴을 0.799초 차로 따돌렸다.</p><p class="by">출처: formula1.com, Al Jazeera</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="standings" aria-labelledby="h-stand">
+  <div class="in">
+    <div class="sec-h"><div><span class="eyebrow">Standings</span><h2 id="h-stand">2026 시즌 순위</h2></div><p>공식 순위 페이지(formula1.com/en/results/2026)에 표기된 값을 그대로 옮겼습니다.</p></div>
+    <div class="notice"><svg class="ic" aria-hidden="true"><use href="#i-yellow"/></svg><div><b>데이터 안내</b> 팀 순위는 멕시코시티 GP까지 반영돼 있습니다. 드라이버 순위 페이지는 11월 2일(KST) 확인 시점에 라운드 표기가 없고, 전체 점수 합계가 팀 순위보다 101점(한 경기 분량) 적습니다. 멕시코 GP 반영 전 집계로 보이며, 공식 페이지가 갱신되면 함께 바뀌어야 합니다.</div></div>
+    <div class="tabs" role="tablist" aria-label="순위 종류">
+      <button class="tab" role="tab" id="tab-d" aria-selected="true" aria-controls="p-d">드라이버 순위</button>
+      <button class="tab" role="tab" id="tab-t" aria-selected="false" aria-controls="p-t">팀 순위</button>
+    </div>
+    <div class="tbl" id="p-d" role="tabpanel" aria-labelledby="tab-d">
+      <div class="scroll"><table class="board">
+        <caption>드라이버 챔피언십 · 점수 · 1위와의 점수 차</caption>
+        <thead><tr><th scope="col">순위</th><th scope="col">드라이버 · 소속</th><th scope="col" class="th-gap">1위 대비</th><th scope="col" style="text-align:right">점수</th></tr></thead>
+        <tbody><tr class="row top3"><th scope="row" class="pos"><span class="medal" aria-hidden="true">🥇</span>1위</th><td class="who"><b>키미 안토넬리</b> <span class="code">ANT</span><small>Kimi Antonelli · ITA · 메르세데스</small></td><td class="gap">—</td><td class="pts"><span class="n">365</span><i class="bar" style="--w:100.0%"></i></td></tr>
+<tr class="row top3"><th scope="row" class="pos"><span class="medal" aria-hidden="true">🥈</span>2위</th><td class="who"><b>조지 러셀</b> <span class="code">RUS</span><small>George Russell · GBR · 메르세데스</small></td><td class="gap">−123</td><td class="pts"><span class="n">242</span><i class="bar" style="--w:66.3%"></i></td></tr>
+<tr class="row top3"><th scope="row" class="pos"><span class="medal" aria-hidden="true">🥉</span>3위</th><td class="who"><b>루이스 해밀턴</b> <span class="code">HAM</span><small>Lewis Hamilton · GBR · 페라리</small></td><td class="gap">−124</td><td class="pts"><span class="n">241</span><i class="bar" style="--w:66.0%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">4</th><td class="who"><b>맥스 페르스타펜</b> <span class="code">VER</span><small>Max Verstappen · NED · 레드불 레이싱</small></td><td class="gap">−129</td><td class="pts"><span class="n">236</span><i class="bar" style="--w:64.7%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">5</th><td class="who"><b>샤를 르클레르</b> <span class="code">LEC</span><small>Charles Leclerc · MON · 페라리</small></td><td class="gap">−132</td><td class="pts"><span class="n">233</span><i class="bar" style="--w:63.8%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">6</th><td class="who"><b>랜도 노리스</b> <span class="code">NOR</span><small>Lando Norris · GBR · 맥라렌</small></td><td class="gap">−154</td><td class="pts"><span class="n">211</span><i class="bar" style="--w:57.8%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">7</th><td class="who"><b>오스카 피아스트리</b> <span class="code">PIA</span><small>Oscar Piastri · AUS · 맥라렌</small></td><td class="gap">−221</td><td class="pts"><span class="n">144</span><i class="bar" style="--w:39.5%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">8</th><td class="who"><b>이삭 하자르</b> <span class="code">HAD</span><small>Isack Hadjar · FRA · 레드불 레이싱</small></td><td class="gap">−260</td><td class="pts"><span class="n">105</span><i class="bar" style="--w:28.8%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">9</th><td class="who"><b>리암 로슨</b> <span class="code">LAW</span><small>Liam Lawson · NZL · 레이싱 불스</small></td><td class="gap">−288</td><td class="pts"><span class="n">77</span><i class="bar" style="--w:21.1%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">10</th><td class="who"><b>피에르 가슬리</b> <span class="code">GAS</span><small>Pierre Gasly · FRA · 알핀</small></td><td class="gap">−323</td><td class="pts"><span class="n">42</span><i class="bar" style="--w:11.5%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">11</th><td class="who"><b>아르비드 린드블라드</b> <span class="code">LIN</span><small>Arvid Lindblad · GBR · 레이싱 불스</small></td><td class="gap">−327</td><td class="pts"><span class="n">38</span><i class="bar" style="--w:10.4%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">12</th><td class="who"><b>프랑코 콜라핀토</b> <span class="code">COL</span><small>Franco Colapinto · ARG · 알핀</small></td><td class="gap">−338</td><td class="pts"><span class="n">27</span><i class="bar" style="--w:7.4%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">13</th><td class="who"><b>올리버 베어먼</b> <span class="code">BEA</span><small>Oliver Bearman · GBR · 하스 F1 팀</small></td><td class="gap">−342</td><td class="pts"><span class="n">23</span><i class="bar" style="--w:6.3%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">14</th><td class="who"><b>니코 휠켄베르크</b> <span class="code">HUL</span><small>Nico Hulkenberg · GER · 아우디</small></td><td class="gap">−352</td><td class="pts"><span class="n">13</span><i class="bar" style="--w:3.6%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">15</th><td class="who"><b>가브리엘 보르톨레투</b> <span class="code">BOR</span><small>Gabriel Bortoleto · BRA · 아우디</small></td><td class="gap">−355</td><td class="pts"><span class="n">10</span><i class="bar" style="--w:2.7%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">16</th><td class="who"><b>에스테반 오콘</b> <span class="code">OCO</span><small>Esteban Ocon · FRA · 하스 F1 팀</small></td><td class="gap">−358</td><td class="pts"><span class="n">7</span><i class="bar" style="--w:1.9%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">17</th><td class="who"><b>페르난도 알론소</b> <span class="code">ALO</span><small>Fernando Alonso · ESP · 애스턴 마틴</small></td><td class="gap">−358</td><td class="pts"><span class="n">7</span><i class="bar" style="--w:1.9%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">18</th><td class="who"><b>카를로스 사인츠</b> <span class="code">SAI</span><small>Carlos Sainz · ESP · 윌리엄스</small></td><td class="gap">−358</td><td class="pts"><span class="n">7</span><i class="bar" style="--w:1.9%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">19</th><td class="who"><b>알렉산더 알본</b> <span class="code">ALB</span><small>Alexander Albon · THA · 윌리엄스</small></td><td class="gap">−360</td><td class="pts"><span class="n">5</span><i class="bar" style="--w:1.4%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">20</th><td class="who"><b>유키 쓰노다</b> <span class="code">TSU</span><small>Yuki Tsunoda · JPN · 레이싱 불스</small></td><td class="gap">−364</td><td class="pts"><span class="n">1</span><i class="bar" style="--w:0.3%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">21</th><td class="who"><b>랜스 스트롤</b> <span class="code">STR</span><small>Lance Stroll · CAN · 애스턴 마틴</small></td><td class="gap">−365</td><td class="pts"><span class="n">0</span><i class="bar" style="--w:0.0%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">22</th><td class="who"><b>발테리 보타스</b> <span class="code">BOT</span><small>Valtteri Bottas · FIN · 캐딜락</small></td><td class="gap">−365</td><td class="pts"><span class="n">0</span><i class="bar" style="--w:0.0%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">23</th><td class="who"><b>세르히오 페레스</b> <span class="code">PER</span><small>Sergio Perez · MEX · 캐딜락</small></td><td class="gap">−365</td><td class="pts"><span class="n">0</span><i class="bar" style="--w:0.0%"></i></td></tr></tbody>
+      </table></div>
+    </div>
+    <div class="tbl" id="p-t" role="tabpanel" aria-labelledby="tab-t" hidden>
+      <div class="scroll"><table class="board">
+        <caption>컨스트럭터 챔피언십 · 점수 · 1위와의 점수 차 (멕시코시티 GP 반영)</caption>
+        <thead><tr><th scope="col">순위</th><th scope="col">팀</th><th scope="col" class="th-gap">1위 대비</th><th scope="col" style="text-align:right">점수</th></tr></thead>
+        <tbody><tr class="row top3"><th scope="row" class="pos"><span class="medal" aria-hidden="true">🥇</span>1위</th><td class="who"><b>메르세데스</b><small>Mercedes</small></td><td class="gap">—</td><td class="pts"><span class="n">630</span><i class="bar" style="--w:100.0%"></i></td></tr>
+<tr class="row top3"><th scope="row" class="pos"><span class="medal" aria-hidden="true">🥈</span>2위</th><td class="who"><b>페라리</b><small>Ferrari</small></td><td class="gap">−126</td><td class="pts"><span class="n">504</span><i class="bar" style="--w:80.0%"></i></td></tr>
+<tr class="row top3"><th scope="row" class="pos"><span class="medal" aria-hidden="true">🥉</span>3위</th><td class="who"><b>레드불 레이싱</b><small>Red Bull Racing</small></td><td class="gap">−248</td><td class="pts"><span class="n">382</span><i class="bar" style="--w:60.6%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">4</th><td class="who"><b>맥라렌</b><small>McLaren</small></td><td class="gap">−265</td><td class="pts"><span class="n">365</span><i class="bar" style="--w:57.9%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">5</th><td class="who"><b>레이싱 불스</b><small>Racing Bulls</small></td><td class="gap">−522</td><td class="pts"><span class="n">108</span><i class="bar" style="--w:17.1%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">6</th><td class="who"><b>알핀</b><small>Alpine</small></td><td class="gap">−561</td><td class="pts"><span class="n">69</span><i class="bar" style="--w:11.0%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">7</th><td class="who"><b>하스 F1 팀</b><small>Haas F1 Team</small></td><td class="gap">−599</td><td class="pts"><span class="n">31</span><i class="bar" style="--w:4.9%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">8</th><td class="who"><b>아우디</b><small>Audi</small></td><td class="gap">−603</td><td class="pts"><span class="n">27</span><i class="bar" style="--w:4.3%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">9</th><td class="who"><b>윌리엄스</b><small>Williams</small></td><td class="gap">−618</td><td class="pts"><span class="n">12</span><i class="bar" style="--w:1.9%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">10</th><td class="who"><b>애스턴 마틴</b><small>Aston Martin</small></td><td class="gap">−623</td><td class="pts"><span class="n">7</span><i class="bar" style="--w:1.1%"></i></td></tr>
+<tr class="row"><th scope="row" class="pos">11</th><td class="who"><b>캐딜락</b><small>Cadillac</small></td><td class="gap">−630</td><td class="pts"><span class="n">0</span><i class="bar" style="--w:0.0%"></i></td></tr></tbody>
+      </table></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="results" aria-labelledby="h-res">
+  <div class="in">
+    <div class="sec-h"><div><span class="eyebrow">Race results</span><h2 id="h-res">그랑프리별 포디엄</h2></div><p>19개 그랑프리의 결승 1~3위와 우승 기록입니다. 우승자로 걸러 볼 수 있습니다.</p></div>
+    <div class="split">
+      <div class="rec"><h3>우승 횟수</h3><p>6명이 19경기를 나눠 가졌습니다. 메르세데스가 12승, 레드불 3승, 페라리와 맥라렌이 각 2승입니다.</p></div>
+      <ol class="wins" aria-label="드라이버별 우승 횟수"><li><span class="nm"><b>키미 안토넬리</b><small>메르세데스</small></span><span class="track"><i style="--w:100.0%"></i></span><span class="ct">9승</span></li>
+<li><span class="nm"><b>맥스 페르스타펜</b><small>레드불 레이싱</small></span><span class="track"><i style="--w:33.3%"></i></span><span class="ct">3승</span></li>
+<li><span class="nm"><b>조지 러셀</b><small>메르세데스</small></span><span class="track"><i style="--w:33.3%"></i></span><span class="ct">3승</span></li>
+<li><span class="nm"><b>랜도 노리스</b><small>맥라렌</small></span><span class="track"><i style="--w:22.2%"></i></span><span class="ct">2승</span></li>
+<li><span class="nm"><b>루이스 해밀턴</b><small>페라리</small></span><span class="track"><i style="--w:11.1%"></i></span><span class="ct">1승</span></li>
+<li><span class="nm"><b>샤를 르클레르</b><small>페라리</small></span><span class="track"><i style="--w:11.1%"></i></span><span class="ct">1승</span></li></ol>
+    </div>
+    <div class="chips" id="win-chips" role="group" aria-label="우승자로 거르기">
+      <button type="button" class="chip" aria-pressed="true" data-win="all">전체 19경기</button>
+<button type="button" class="chip" aria-pressed="false" data-win="ANT">키미 안토넬리 9승</button>
+<button type="button" class="chip" aria-pressed="false" data-win="VER">맥스 페르스타펜 3승</button>
+<button type="button" class="chip" aria-pressed="false" data-win="RUS">조지 러셀 3승</button>
+<button type="button" class="chip" aria-pressed="false" data-win="NOR">랜도 노리스 2승</button>
+<button type="button" class="chip" aria-pressed="false" data-win="HAM">루이스 해밀턴 1승</button>
+<button type="button" class="chip" aria-pressed="false" data-win="LEC">샤를 르클레르 1승</button>
+    </div>
+    <div class="cards">
+      <article class="card race" data-win="RUS"><header><span class="rd">R01</span><span class="dt">3월 8일 · 58랩</span></header><h3>호주 그랑프리</h3><p class="sub">Australia</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>조지 러셀</b> <em>RUS</em></span><span class="tm">1:23:06.801</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>키미 안토넬리</b> <em>ANT</em></span><span class="tm">+2.974</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>샤를 르클레르</b> <em>LEC</em></span><span class="tm">+15.519</span></div></div></article>
+<article class="card race" data-win="ANT"><header><span class="rd">R02</span><span class="dt">3월 15일 · 56랩</span></header><h3>중국 그랑프리</h3><p class="sub">China</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>키미 안토넬리</b> <em>ANT</em></span><span class="tm">1:33:15.607</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>조지 러셀</b> <em>RUS</em></span><span class="tm">+5.515</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>루이스 해밀턴</b> <em>HAM</em></span><span class="tm">+25.267</span></div></div></article>
+<article class="card race" data-win="ANT"><header><span class="rd">R03</span><span class="dt">3월 29일 · 53랩</span></header><h3>일본 그랑프리</h3><p class="sub">Japan</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>키미 안토넬리</b> <em>ANT</em></span><span class="tm">1:28:03.403</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>오스카 피아스트리</b> <em>PIA</em></span><span class="tm">+13.722</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>샤를 르클레르</b> <em>LEC</em></span><span class="tm">+15.27</span></div></div></article>
+<article class="card race" data-win="ANT"><header><span class="rd">R04</span><span class="dt">5월 3일 · 57랩</span></header><h3>마이애미 그랑프리</h3><p class="sub">Miami</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>키미 안토넬리</b> <em>ANT</em></span><span class="tm">1:33:19.273</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>랜도 노리스</b> <em>NOR</em></span><span class="tm">+3.264</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>오스카 피아스트리</b> <em>PIA</em></span><span class="tm">+27.092</span></div></div></article>
+<article class="card race" data-win="ANT"><header><span class="rd">R05</span><span class="dt">5월 24일 · 68랩</span></header><h3>캐나다 그랑프리</h3><p class="sub">Canada</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>키미 안토넬리</b> <em>ANT</em></span><span class="tm">1:28:15.758</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>루이스 해밀턴</b> <em>HAM</em></span><span class="tm">+10.768</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>맥스 페르스타펜</b> <em>VER</em></span><span class="tm">+11.276</span></div></div></article>
+<article class="card race" data-win="ANT"><header><span class="rd">R06</span><span class="dt">6월 7일 · 78랩</span></header><h3>모나코 그랑프리</h3><p class="sub">Monaco</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>키미 안토넬리</b> <em>ANT</em></span><span class="tm">2:23:31.243</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>루이스 해밀턴</b> <em>HAM</em></span><span class="tm">+6.271</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>이삭 하자르</b> <em>HAD</em></span><span class="tm">+23.394</span></div></div></article>
+<article class="card race" data-win="HAM"><header><span class="rd">R07</span><span class="dt">6월 14일 · 66랩</span></header><h3>바르셀로나-카탈루냐 그랑프리</h3><p class="sub">Barcelona-Catalunya</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>루이스 해밀턴</b> <em>HAM</em></span><span class="tm">1:32:28.105</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>조지 러셀</b> <em>RUS</em></span><span class="tm">+19.561</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>랜도 노리스</b> <em>NOR</em></span><span class="tm">+23.719</span></div></div></article>
+<article class="card race" data-win="RUS"><header><span class="rd">R08</span><span class="dt">6월 28일 · 71랩</span></header><h3>오스트리아 그랑프리</h3><p class="sub">Austria</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>조지 러셀</b> <em>RUS</em></span><span class="tm">1:26:37.979</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>맥스 페르스타펜</b> <em>VER</em></span><span class="tm">+1.611</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>키미 안토넬리</b> <em>ANT</em></span><span class="tm">+1.986</span></div></div></article>
+<article class="card race" data-win="LEC"><header><span class="rd">R09</span><span class="dt">7월 5일 · 52랩</span></header><h3>영국 그랑프리</h3><p class="sub">Great Britain</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>샤를 르클레르</b> <em>LEC</em></span><span class="tm">1:27:11.335</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>조지 러셀</b> <em>RUS</em></span><span class="tm">+0.427</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>루이스 해밀턴</b> <em>HAM</em></span><span class="tm">+0.772</span></div></div></article>
+<article class="card race" data-win="ANT"><header><span class="rd">R10</span><span class="dt">7월 19일 · 44랩</span></header><h3>벨기에 그랑프리</h3><p class="sub">Belgium</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>키미 안토넬리</b> <em>ANT</em></span><span class="tm">1:24:42.479</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>샤를 르클레르</b> <em>LEC</em></span><span class="tm">+1.952</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>맥스 페르스타펜</b> <em>VER</em></span><span class="tm">+11.586</span></div></div></article>
+<article class="card race" data-win="NOR"><header><span class="rd">R11</span><span class="dt">7월 26일 · 70랩</span></header><h3>헝가리 그랑프리</h3><p class="sub">Hungary</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>랜도 노리스</b> <em>NOR</em></span><span class="tm">1:39:56.180</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>맥스 페르스타펜</b> <em>VER</em></span><span class="tm">+15.08</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>키미 안토넬리</b> <em>ANT</em></span><span class="tm">+18.728</span></div></div></article>
+<article class="card race" data-win="NOR"><header><span class="rd">R12</span><span class="dt">8월 23일 · 72랩</span></header><h3>네덜란드 그랑프리</h3><p class="sub">Netherlands</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>랜도 노리스</b> <em>NOR</em></span><span class="tm">2:04:44.859</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>키미 안토넬리</b> <em>ANT</em></span><span class="tm">+11.536</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>조지 러셀</b> <em>RUS</em></span><span class="tm">+15.906</span></div></div></article>
+<article class="card race" data-win="ANT"><header><span class="rd">R13</span><span class="dt">9월 6일 · 53랩</span></header><h3>이탈리아 그랑프리</h3><p class="sub">Italy</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>키미 안토넬리</b> <em>ANT</em></span><span class="tm">1:51:15.281</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>조지 러셀</b> <em>RUS</em></span><span class="tm">+3.857</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>맥스 페르스타펜</b> <em>VER</em></span><span class="tm">+14.718</span></div></div></article>
+<article class="card race" data-win="ANT"><header><span class="rd">R14</span><span class="dt">9월 13일 · 57랩</span></header><h3>스페인 그랑프리</h3><p class="sub">Spain</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>키미 안토넬리</b> <em>ANT</em></span><span class="tm">1:34:23.754</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>맥스 페르스타펜</b> <em>VER</em></span><span class="tm">+4.351</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>랜도 노리스</b> <em>NOR</em></span><span class="tm">+5.089</span></div></div></article>
+<article class="card race" data-win="RUS"><header><span class="rd">R15</span><span class="dt">9월 26일 · 51랩</span></header><h3>아제르바이잔 그랑프리</h3><p class="sub">Azerbaijan</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>조지 러셀</b> <em>RUS</em></span><span class="tm">1:38:02.143</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>맥스 페르스타펜</b> <em>VER</em></span><span class="tm">+0.196</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>이삭 하자르</b> <em>HAD</em></span><span class="tm">+10.704</span></div></div></article>
+<article class="card race" data-win="VER"><header><span class="rd">R16</span><span class="dt">10월 4일 · 55랩</span></header><h3>바레인 그랑프리</h3><p class="sub">Bahrain</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>맥스 페르스타펜</b> <em>VER</em></span><span class="tm">1:47:14.808</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>키미 안토넬리</b> <em>ANT</em></span><span class="tm">+2.307</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>루이스 해밀턴</b> <em>HAM</em></span><span class="tm">+4.919</span></div></div><p class="evt plain">공식 일정 표기: Gulf Air Bahrain Grand Prix in Malaysia</p></article>
+<article class="card race" data-win="VER"><header><span class="rd">R17</span><span class="dt">10월 11일 · 62랩</span></header><h3>싱가포르 그랑프리</h3><p class="sub">Singapore</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>맥스 페르스타펜</b> <em>VER</em></span><span class="tm">1:42:00.785</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>샤를 르클레르</b> <em>LEC</em></span><span class="tm">+7.335</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>키미 안토넬리</b> <em>ANT</em></span><span class="tm">+24.573</span></div></div></article>
+<article class="card race" data-win="ANT"><header><span class="rd">R18</span><span class="dt">10월 25일 · 56랩</span></header><h3>미국 그랑프리</h3><p class="sub">United States</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>키미 안토넬리</b> <em>ANT</em></span><span class="tm">1:35:16.650</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>샤를 르클레르</b> <em>LEC</em></span><span class="tm">+13.078</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>맥스 페르스타펜</b> <em>VER</em></span><span class="tm">+17.485</span></div></div></article>
+<article class="card race" data-win="VER"><header><span class="rd">R19</span><span class="dt">11월 1일 · 71랩</span></header><h3>멕시코시티 그랑프리</h3><p class="sub">Mexico</p><div class="pods"><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥇</span>우승</span><span class="who"><b>맥스 페르스타펜</b> <em>VER</em></span><span class="tm">2:20:28.772</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥈</span>2위</span><span class="who"><b>루이스 해밀턴</b> <em>HAM</em></span><span class="tm">+0.799</span></div><div class="pod"><span class="rk"><span class="medal" aria-hidden="true">🥉</span>3위</span><span class="who"><b>키미 안토넬리</b> <em>ANT</em></span><span class="tm">+4.006</span></div></div><p class="evt"><svg class="ic" aria-hidden="true"><use href="#i-sc"/></svg><span><b>세이프티 카</b> 59랩 · 피아스트리–린드블라드 접촉</span></p></article>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="schedule" aria-labelledby="h-sch">
+  <div class="in">
+    <div class="sec-h"><div><span class="eyebrow">Calendar</span><h2 id="h-sch">남은 4경기와 세션 안내</h2></div><p>공식 캘린더 기준입니다. 세션별 시간은 공식 일정 페이지에서 확인하세요.</p></div>
+    <article class="card next" aria-labelledby="h-next">
+      <div>
+        <span class="tag red">다음 레이스 · R20</span>
+        <h3 id="h-next">상파울루 그랑프리</h3>
+        <p class="dts" style="font-family:var(--f-mono);font-weight:600;font-size:1.1rem">11월 6일 – 8일 · 브라질</p>
+        <p style="color:var(--fg-dim);margin-top:12px">MSC Cruises Grande Prêmio de São Paulo. 안토넬리가 이미 챔피언을 확정해, 2위 이하 순위와 팀 타이틀이 남은 4경기의 관전 포인트입니다.</p>
+        <div class="btn-row"><a class="btn" href="https://www.formula1.com/en/racing/2026/brazil" target="_blank" rel="noopener noreferrer">공식 일정 보기<span class="sr"> (새 탭에서 열림)</span></a></div>
+      </div>
+      <div class="up"><div class="dday" id="dday">11월 6일<small>시작</small></div><small>레이스 위크 시작까지</small></div>
+    </article>
+    <div class="cards">
+      <article class="card up"><span class="rd">R21</span><h3>라스베이거스 그랑프리</h3><span class="dts">11월 19 – 21일</span><small>미국 · Heineken Las Vegas Grand Prix</small></article>
+      <article class="card up"><span class="rd">R22</span><h3>카타르 그랑프리</h3><span class="dts">11월 27 – 29일</span><small>카타르 · Qatar Airways Qatar Grand Prix</small></article>
+      <article class="card up"><span class="rd">R23</span><h3>아부다비 그랑프리</h3><span class="dts">12월 4 – 6일</span><small>UAE · Etihad Airways Abu Dhabi Grand Prix · 시즌 최종전</small></article>
+    </div>
+    <div class="notice" style="margin-top:20px"><svg class="ic" aria-hidden="true"><use href="#i-yellow"/></svg><div><b>일정 변동 가능성</b> 9월 RacingNews365 보도는 중동 정세 때문에 카타르·아부다비 개최가 불투명하다고 전했습니다. 11월 2일 현재 공식 캘린더에는 두 경기가 모두 표기돼 있으니, 출발 전에 공식 일정을 다시 확인하세요.</div></div>
+
+    <h3 class="sub-h">세션 가이드</h3>
+    <p style="color:var(--fg-dim);margin:0 0 18px;max-width:40rem">그랑프리 주말은 두 가지 형식으로 열립니다. 어떤 형식인지는 각 대회 공식 일정에 표시됩니다.</p>
+    <div class="guide">
+      <div class="sess"><h4>프랙티스 1</h4><span class="en">PRACTICE 1</span><p>차량 세팅과 타이어를 확인하는 첫 자유 주행입니다. 순위나 점수는 없습니다.</p><span class="wk">모든 주말</span></div>
+      <div class="sess"><h4>프랙티스 2</h4><span class="en">PRACTICE 2</span><p>일반 주말에서 레이스 페이스와 연료 탑재 상태를 점검하는 두 번째 자유 주행입니다.</p><span class="wk">일반 주말</span></div>
+      <div class="sess"><h4>프랙티스 3</h4><span class="en">PRACTICE 3</span><p>퀄리파잉 직전의 마지막 자유 주행입니다.</p><span class="wk">일반 주말</span></div>
+      <div class="sess"><h4>스프린트 퀄리파잉</h4><span class="en">SPRINT QUALIFYING</span><p>스프린트의 출발 순서를 정하는 예선입니다.</p><span class="wk">스프린트 주말</span></div>
+      <div class="sess"><h4>스프린트</h4><span class="en">SPRINT</span><p>짧게 치르는 결승입니다. 올 시즌 기준 1~8위에게 8점부터 1점까지 줍니다.</p><span class="wk">스프린트 주말</span></div>
+      <div class="sess"><h4>퀄리파잉</h4><span class="en">QUALIFYING</span><p>일요일 레이스의 출발 순서를 정하는 예선입니다.</p><span class="wk">모든 주말</span></div>
+      <div class="sess"><h4>레이스</h4><span class="en">RACE</span><p>일요일 결승입니다. 1~10위가 25·18·15·12·10·8·6·4·2·1점을 받습니다.</p><span class="wk">모든 주말</span></div>
+    </div>
+
+    <h3 class="sub-h">깃발·기록 아이콘</h3>
+    <p style="color:var(--fg-dim);margin:0 0 4px">경기 상황은 아이콘과 글자를 함께 표기합니다.</p>
+    <ul class="legend">
+      <li><svg class="ic" aria-hidden="true"><use href="#i-yellow"/></svg><span><b>옐로 플래그</b>코스에 위험이 있습니다. 속도를 줄이고 추월할 수 없습니다.</span></li>
+      <li><svg class="ic" aria-hidden="true"><use href="#i-red"/></svg><span><b>레드 플래그</b>사고나 악천후로 세션이 중단됩니다.</span></li>
+      <li><svg class="ic" aria-hidden="true"><use href="#i-sc"/></svg><span><b>세이프티 카</b>사고 처리를 위해 선두 앞에 투입돼 차들의 속도를 묶습니다.</span></li>
+      <li><svg class="ic" aria-hidden="true"><use href="#i-fl"/></svg><span><b>패스티스트 랩</b>세션에서 가장 빠른 한 바퀴입니다. 타이밍 화면에서 보라색으로 표시됩니다.</span></li>
+      <li><svg class="ic" aria-hidden="true"><use href="#i-chq"/></svg><span><b>체커드 플래그</b>레이스나 세션의 종료를 알립니다.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="sec" id="korea" aria-labelledby="h-kor">
+  <div class="in">
+    <div class="sec-h"><div><span class="eyebrow">Korea</span><h2 id="h-kor">한국 레이싱 뉴스</h2></div><p>2026 오네 슈퍼레이스 챔피언십 소식입니다. 올해로 출범 20주년을 맞았습니다.</p></div>
+    <article class="card kfeature">
+      <div>
+        <span class="tag red">챔피언 확정</span>
+        <h3>이창욱, 6라운드 우승으로 2년 연속 6000 클래스 챔피언</h3>
+        <p>금호 SL모터스포츠의 이창욱이 9월 13일 영암 코리아 인터내셔널 서킷에서 열린 6라운드에서 우승했다. 시즌 5승째로, 최종전 결과와 관계없이 드라이버 타이틀을 확정했다. 금호타이어는 타이어 제조사 챔피언도 조기에 확정했다.</p>
+      </div>
+      <ul class="kpoints">
+        <li><b>🏆 챔피언 이창욱</b>토요타 가주 레이싱 6000 클래스 · 2025, 2026</li>
+        <li><b>시즌 5승</b>6라운드 시점 기록</li>
+        <li><b>금호 SL모터스포츠</b>6라운드 더블 포디엄 (이창욱, 이정우)</li>
+      </ul>
+    </article>
+    <div class="cards">
+      <article class="card news"><span class="kicker">5라운드 · 용인 나이트 레이스</span><h3>황진우, 12번 그리드에서 출발해 역전 우승</h3><p>8월 22일 에버랜드 스피드웨이에서 열린 5라운드 6000 클래스 결승에서 준피티드 레이싱의 황진우가 12번 그리드의 불리함을 뒤집었다. 프리우스 PHEV는 이율, 알핀은 김정수, 금호 M은 송덕삼이 이겼다.</p><p class="by">출처: 카위키 (2026.08.24)</p></article>
+      <article class="card news"><span class="kicker">최종전 · 골든 모먼츠</span><h3>용인에서 7·8라운드 더블 라운드로 시즌 마무리</h3><p>10월 24~25일 에버랜드 스피드웨이에서 8개 클래스가 달렸다. 6000 클래스 챔피언은 이미 정해진 상태에서 종합 2위와 다른 클래스 타이틀이 걸렸다. 최종전 결과는 슈퍼레이스 공식 채널에서 확인하세요.</p><p class="by">출처: 위키트리 최종전 프리뷰</p></article>
+      <article class="card news"><span class="kicker">KARA · 카트</span><h3>로탁스 맥스 챌린지, 파주에서 2라운드</h3><p>대한자동차경주협회가 7월 5일 파주 스피드파크(1.2km)에서 2라운드를 열었다. 15랩으로 치른 DD2 클래스는 카즈마 키무라가 10분44초392로 우승했다. 3라운드는 8월 30일 같은 곳에서 열릴 예정이었다.</p><p class="by">출처: 오토뷰 (2026.07.06)</p></article>
+    </div>
+
+    <h3 class="sub-h">2026 시즌 일정</h3>
+    <div class="tbl" style="margin-top:14px"><div class="scroll"><table class="rounds">
+      <thead><tr><th scope="col">라운드</th><th scope="col">날짜</th><th scope="col">서킷</th><th scope="col">비고</th><th scope="col">상태</th></tr></thead>
+      <tbody>
+        <tr><th scope="row" class="rr">R1–2</th><td class="dd">4월 18–19일</td><td>용인 에버랜드 스피드웨이</td><td>개막전 · 더블 라운드</td><td><span class="pill done">종료</span></td></tr>
+        <tr><th scope="row" class="rr">R3</th><td class="dd">5월 24일</td><td>영암 코리아 인터내셔널 서킷</td><td>아시아 모터스포츠 카니발 · 피트스탑 레이스</td><td><span class="pill done">종료</span></td></tr>
+        <tr><th scope="row" class="rr">R4</th><td class="dd">7월 18일</td><td>인제 스피디움</td><td>강원 국제 모터페스타 · 나이트 레이스</td><td><span class="pill done">종료</span></td></tr>
+        <tr><th scope="row" class="rr">R5</th><td class="dd">8월 22일</td><td>용인 에버랜드 스피드웨이</td><td>용인 나이트 레이스</td><td><span class="pill done">종료</span></td></tr>
+        <tr><th scope="row" class="rr">R6</th><td class="dd">9월 12–13일</td><td>영암 코리아 인터내셔널 서킷</td><td>전남GT</td><td><span class="pill done">종료</span></td></tr>
+        <tr><th scope="row" class="rr">R7–8</th><td class="dd">10월 24–25일</td><td>용인 에버랜드 스피드웨이</td><td>최종전 골든 모먼츠 · 더블 라운드</td><td><span class="pill">결과 확인 필요</span></td></tr>
+      </tbody>
+    </table></div></div>
+    <p class="srcs">출처:
+      <a href="https://www.autoview.co.kr/ko-kr/articles/101746" target="_blank" rel="noopener noreferrer">오토뷰 6라운드</a>
+      <a href="https://www.carwiki.co.kr/news/1013658" target="_blank" rel="noopener noreferrer">카위키 5라운드</a>
+      <a href="https://www.wikitree.co.kr/articles/1167950" target="_blank" rel="noopener noreferrer">위키트리 최종전</a>
+      <a href="https://cjnews.cj.net/%EC%8A%88%ED%8D%BC%EB%A0%88%EC%9D%B4%EC%8A%A4-2026%EC%8B%9C%EC%A6%8C-%EC%9D%BC%EC%A0%95-%EC%B5%9C%EC%A2%85-%ED%99%95%EC%A0%95/" target="_blank" rel="noopener noreferrer">CJ뉴스 시즌 일정</a>
+      <a href="https://www.autoview.co.kr/ko-kr/articles/100892" target="_blank" rel="noopener noreferrer">오토뷰 KARA 카트</a></p>
+  </div>
+</section>
+
+<section class="sec shop" id="shop" aria-labelledby="h-shop">
+  <div class="in">
+    <div class="sec-h"><div><span class="eyebrow">Official merchandise</span><h2 id="h-shop">F1 공식 굿즈 판매처</h2></div><p>F1 공식 사이트 상단 메뉴에 연결된 판매처만 모았습니다.</p></div>
+    <div class="shop-grid">
+      <article class="card"><span class="tag line">공식 스토어</span><h3>F1 Store</h3><span class="dom">f1store.formula1.com</span><p style="margin-top:10px">팀 의류, 모자, 기념품을 파는 F1 공식 온라인 스토어입니다. 공식 사이트의 Store 메뉴가 이 주소로 이어집니다.</p><a class="btn" href="https://f1store.formula1.com/en/" target="_blank" rel="noopener noreferrer">F1 Store 가기<span class="sr"> (새 탭에서 열림)</span></a></article>
+      <article class="card"><span class="tag line">공식 컬렉터블</span><h3>F1 Authentics</h3><span class="dom">f1authentics.com</span><p style="margin-top:10px">레이스 사용품과 서명 기념품 같은 수집용 아이템을 다루는 공식 판매처입니다.</p><a class="btn" href="https://www.f1authentics.com/" target="_blank" rel="noopener noreferrer">F1 Authentics 가기<span class="sr"> (새 탭에서 열림)</span></a></article>
+      <article class="card"><span class="tag line">공식 파트너</span><h3>퓨마 × F1</h3><span class="dom">go.puma.com/formula1-pp</span><p style="margin-top:10px">F1 공식 파트너 목록에 올라 있는 퓨마의 F1 컬렉션 페이지입니다.</p><a class="btn" href="https://go.puma.com/formula1-pp" target="_blank" rel="noopener noreferrer">퓨마 F1 보기<span class="sr"> (새 탭에서 열림)</span></a></article>
+    </div>
+    <div class="check">
+      <h3>구매 전에 확인하세요</h3>
+      <ul>
+        <li><b>주소를 확인하세요.</b> 공식 사이트(formula1.com) 상단의 Store, Authentics 메뉴로 들어가면 가짜 사이트를 피할 수 있습니다.</li>
+        <li><b>한국 배송과 관세는 각 스토어 안내를 따르세요.</b> 배송 가능 국가와 부가 비용은 스토어와 시기마다 다를 수 있습니다.</li>
+        <li><b>2026 시즌 상품인지 보세요.</b> 올해는 아우디와 캐딜락이 새로 합류했고 팀 로고가 지난 시즌과 다릅니다.</li>
+      </ul>
+    </div>
+    <div class="more">
+      <a class="btn ghost" href="https://ticketing.formula1.com/seasons/" target="_blank" rel="noopener noreferrer">티켓<span class="sr"> (새 탭에서 열림)</span></a>
+      <a class="btn ghost" href="https://f1experiences.com/?utm_source=formula1.com&utm_medium=referral&utm_campaign=general" target="_blank" rel="noopener noreferrer">체험 패키지<span class="sr"> (새 탭에서 열림)</span></a>
+      <a class="btn ghost" href="https://f1tv.formula1.com" target="_blank" rel="noopener noreferrer">F1 TV<span class="sr"> (새 탭에서 열림)</span></a>
+      <a class="btn ghost" href="https://www.formula1.com/en/information/formula-1-partners.2shz7bIVhGgS3ovP69N3Rs" target="_blank" rel="noopener noreferrer">공식 파트너 전체<span class="sr"> (새 탭에서 열림)</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="archive" aria-labelledby="h-arc">
+  <div class="in">
+    <div class="sec-h"><div><span class="eyebrow">Archive 1980 – 2026</span><h2 id="h-arc">챔피언 기록실</h2></div><p>1980년부터 2026년까지 해마다의 드라이버즈 챔피언입니다. 10년 단위로 골라 보세요.</p></div>
+    <div class="arch-split">
+      <div>
+        <div class="chips" id="dec-chips" role="group" aria-label="연대 선택">
+          <button type="button" class="chip" aria-pressed="false" data-dec="1980s">1980s</button>
+<button type="button" class="chip" aria-pressed="false" data-dec="1990s">1990s</button>
+<button type="button" class="chip" aria-pressed="false" data-dec="2000s">2000s</button>
+<button type="button" class="chip" aria-pressed="false" data-dec="2010s">2010s</button>
+<button type="button" class="chip" aria-pressed="true" data-dec="2020s">2020s</button>
+        </div>
+        <div class="tbl"><div class="scroll"><table class="board">
+          <caption>연도별 드라이버즈 챔피언 · 소속 팀</caption>
+          <thead><tr><th scope="col">연도</th><th scope="col">챔피언</th><th scope="col" style="text-align:right">팀</th></tr></thead>
+          <tbody id="champ-body"><tr data-dec="1980s" hidden><th scope="row" class="yr">1980</th><td class="who"><b>앨런 존스</b><small>Alan Jones</small></td><td class="tm2">Williams</td></tr>
+<tr data-dec="1980s" hidden><th scope="row" class="yr">1981</th><td class="who"><b>넬슨 피케</b><small>Nelson Piquet</small></td><td class="tm2">Brabham</td></tr>
+<tr data-dec="1980s" hidden><th scope="row" class="yr">1982</th><td class="who"><b>케케 로즈버그</b><small>Keke Rosberg</small></td><td class="tm2">Williams</td></tr>
+<tr data-dec="1980s" hidden><th scope="row" class="yr">1983</th><td class="who"><b>넬슨 피케</b><small>Nelson Piquet</small></td><td class="tm2">Brabham</td></tr>
+<tr data-dec="1980s" hidden><th scope="row" class="yr">1984</th><td class="who"><b>니키 라우다</b><small>Niki Lauda</small></td><td class="tm2">McLaren</td></tr>
+<tr data-dec="1980s" hidden><th scope="row" class="yr">1985</th><td class="who"><b>알랭 프로스트</b><small>Alain Prost</small></td><td class="tm2">McLaren</td></tr>
+<tr data-dec="1980s" hidden><th scope="row" class="yr">1986</th><td class="who"><b>알랭 프로스트</b><small>Alain Prost</small></td><td class="tm2">McLaren</td></tr>
+<tr data-dec="1980s" hidden><th scope="row" class="yr">1987</th><td class="who"><b>넬슨 피케</b><small>Nelson Piquet</small></td><td class="tm2">Williams</td></tr>
+<tr data-dec="1980s" hidden><th scope="row" class="yr">1988</th><td class="who"><b>아일톤 세나</b><small>Ayrton Senna</small></td><td class="tm2">McLaren</td></tr>
+<tr data-dec="1980s" hidden><th scope="row" class="yr">1989</th><td class="who"><b>알랭 프로스트</b><small>Alain Prost</small></td><td class="tm2">McLaren</td></tr>
+<tr data-dec="1990s" hidden><th scope="row" class="yr">1990</th><td class="who"><b>아일톤 세나</b><small>Ayrton Senna</small></td><td class="tm2">McLaren</td></tr>
+<tr data-dec="1990s" hidden><th scope="row" class="yr">1991</th><td class="who"><b>아일톤 세나</b><small>Ayrton Senna</small></td><td class="tm2">McLaren</td></tr>
+<tr data-dec="1990s" hidden><th scope="row" class="yr">1992</th><td class="who"><b>나이절 맨셀</b><small>Nigel Mansell</small></td><td class="tm2">Williams</td></tr>
+<tr data-dec="1990s" hidden><th scope="row" class="yr">1993</th><td class="who"><b>알랭 프로스트</b><small>Alain Prost</small></td><td class="tm2">Williams</td></tr>
+<tr data-dec="1990s" hidden><th scope="row" class="yr">1994</th><td class="who"><b>미하엘 슈마허</b><small>Michael Schumacher</small></td><td class="tm2">Benetton</td></tr>
+<tr data-dec="1990s" hidden><th scope="row" class="yr">1995</th><td class="who"><b>미하엘 슈마허</b><small>Michael Schumacher</small></td><td class="tm2">Benetton</td></tr>
+<tr data-dec="1990s" hidden><th scope="row" class="yr">1996</th><td class="who"><b>데이먼 힐</b><small>Damon Hill</small></td><td class="tm2">Williams</td></tr>
+<tr data-dec="1990s" hidden><th scope="row" class="yr">1997</th><td class="who"><b>자크 빌뇌브</b><small>Jacques Villeneuve</small></td><td class="tm2">Williams</td></tr>
+<tr data-dec="1990s" hidden><th scope="row" class="yr">1998</th><td class="who"><b>미카 하키넨</b><small>Mika Häkkinen</small></td><td class="tm2">McLaren</td></tr>
+<tr data-dec="1990s" hidden><th scope="row" class="yr">1999</th><td class="who"><b>미카 하키넨</b><small>Mika Häkkinen</small></td><td class="tm2">McLaren</td></tr>
+<tr data-dec="2000s" hidden><th scope="row" class="yr">2000</th><td class="who"><b>미하엘 슈마허</b><small>Michael Schumacher</small></td><td class="tm2">Ferrari</td></tr>
+<tr data-dec="2000s" hidden><th scope="row" class="yr">2001</th><td class="who"><b>미하엘 슈마허</b><small>Michael Schumacher</small></td><td class="tm2">Ferrari</td></tr>
+<tr data-dec="2000s" hidden><th scope="row" class="yr">2002</th><td class="who"><b>미하엘 슈마허</b><small>Michael Schumacher</small></td><td class="tm2">Ferrari</td></tr>
+<tr data-dec="2000s" hidden><th scope="row" class="yr">2003</th><td class="who"><b>미하엘 슈마허</b><small>Michael Schumacher</small></td><td class="tm2">Ferrari</td></tr>
+<tr data-dec="2000s" hidden><th scope="row" class="yr">2004</th><td class="who"><b>미하엘 슈마허</b><small>Michael Schumacher</small></td><td class="tm2">Ferrari</td></tr>
+<tr data-dec="2000s" hidden><th scope="row" class="yr">2005</th><td class="who"><b>페르난도 알론소</b><small>Fernando Alonso</small></td><td class="tm2">Renault</td></tr>
+<tr data-dec="2000s" hidden><th scope="row" class="yr">2006</th><td class="who"><b>페르난도 알론소</b><small>Fernando Alonso</small></td><td class="tm2">Renault</td></tr>
+<tr data-dec="2000s" hidden><th scope="row" class="yr">2007</th><td class="who"><b>키미 라이쾨넨</b><small>Kimi Räikkönen</small></td><td class="tm2">Ferrari</td></tr>
+<tr data-dec="2000s" hidden><th scope="row" class="yr">2008</th><td class="who"><b>루이스 해밀턴</b><small>Lewis Hamilton</small></td><td class="tm2">McLaren</td></tr>
+<tr data-dec="2000s" hidden><th scope="row" class="yr">2009</th><td class="who"><b>젠슨 버튼</b><small>Jenson Button</small></td><td class="tm2">Brawn GP</td></tr>
+<tr data-dec="2010s" hidden><th scope="row" class="yr">2010</th><td class="who"><b>제바스티안 페텔</b><small>Sebastian Vettel</small></td><td class="tm2">Red Bull</td></tr>
+<tr data-dec="2010s" hidden><th scope="row" class="yr">2011</th><td class="who"><b>제바스티안 페텔</b><small>Sebastian Vettel</small></td><td class="tm2">Red Bull</td></tr>
+<tr data-dec="2010s" hidden><th scope="row" class="yr">2012</th><td class="who"><b>제바스티안 페텔</b><small>Sebastian Vettel</small></td><td class="tm2">Red Bull</td></tr>
+<tr data-dec="2010s" hidden><th scope="row" class="yr">2013</th><td class="who"><b>제바스티안 페텔</b><small>Sebastian Vettel</small></td><td class="tm2">Red Bull</td></tr>
+<tr data-dec="2010s" hidden><th scope="row" class="yr">2014</th><td class="who"><b>루이스 해밀턴</b><small>Lewis Hamilton</small></td><td class="tm2">Mercedes</td></tr>
+<tr data-dec="2010s" hidden><th scope="row" class="yr">2015</th><td class="who"><b>루이스 해밀턴</b><small>Lewis Hamilton</small></td><td class="tm2">Mercedes</td></tr>
+<tr data-dec="2010s" hidden><th scope="row" class="yr">2016</th><td class="who"><b>니코 로즈버그</b><small>Nico Rosberg</small></td><td class="tm2">Mercedes</td></tr>
+<tr data-dec="2010s" hidden><th scope="row" class="yr">2017</th><td class="who"><b>루이스 해밀턴</b><small>Lewis Hamilton</small></td><td class="tm2">Mercedes</td></tr>
+<tr data-dec="2010s" hidden><th scope="row" class="yr">2018</th><td class="who"><b>루이스 해밀턴</b><small>Lewis Hamilton</small></td><td class="tm2">Mercedes</td></tr>
+<tr data-dec="2010s" hidden><th scope="row" class="yr">2019</th><td class="who"><b>루이스 해밀턴</b><small>Lewis Hamilton</small></td><td class="tm2">Mercedes</td></tr>
+<tr data-dec="2020s"><th scope="row" class="yr">2020</th><td class="who"><b>루이스 해밀턴</b><small>Lewis Hamilton</small></td><td class="tm2">Mercedes</td></tr>
+<tr data-dec="2020s"><th scope="row" class="yr">2021</th><td class="who"><b>맥스 페르스타펜</b><small>Max Verstappen</small></td><td class="tm2">Red Bull</td></tr>
+<tr data-dec="2020s"><th scope="row" class="yr">2022</th><td class="who"><b>맥스 페르스타펜</b><small>Max Verstappen</small></td><td class="tm2">Red Bull</td></tr>
+<tr data-dec="2020s"><th scope="row" class="yr">2023</th><td class="who"><b>맥스 페르스타펜</b><small>Max Verstappen</small></td><td class="tm2">Red Bull</td></tr>
+<tr data-dec="2020s"><th scope="row" class="yr">2024</th><td class="who"><b>맥스 페르스타펜</b><small>Max Verstappen</small></td><td class="tm2">Red Bull</td></tr>
+<tr data-dec="2020s"><th scope="row" class="yr">2025</th><td class="who"><b>랜도 노리스</b><small>Lando Norris</small></td><td class="tm2">McLaren</td></tr>
+<tr data-dec="2020s"><th scope="row" class="yr">2026</th><td class="who"><b>키미 안토넬리</b><small>Kimi Antonelli</small></td><td class="tm2">Mercedes</td></tr></tbody>
+        </table></div></div>
+      </div>
+      <div class="flash">
+        <article class="card"><span class="y">1984</span><h3>0.5점 차로 갈린 타이틀</h3><p>니키 라우다가 같은 팀 알랭 프로스트를 0.5점 차로 눌렀다. 모나코가 절반 거리에서 중단돼 절반 점수만 줬던 결과가 승부를 갈랐다.</p></article>
+        <article class="card"><span class="y">1988</span><h3>맥라렌-혼다, 16경기 중 15승</h3><p>아일톤 세나가 첫 타이틀을 가져간 해다. 맥라렌-혼다 조합이 시즌 거의 모든 그랑프리를 이겼다.</p></article>
+        <article class="card"><span class="y">2010</span><h3>영암에서 열린 첫 코리아 그랑프리</h3><p>전남 영암 코리아 인터내셔널 서킷(KIC)이 2010년부터 2013년까지 F1을 개최했다. 첫해는 페르난도 알론소, 이후 세 번은 제바스티안 페텔이 우승했다.</p></article>
+        <article class="card"><span class="y">2020</span><h3>해밀턴, 통산 7번째 타이틀</h3><p>루이스 해밀턴이 메르세데스에서 7번째 월드 챔피언에 올랐다. 올해 안토넬리는 해밀턴 이후 처음 메르세데스에 타이틀을 안긴 드라이버가 됐다.</p></article>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="in">
+    <div class="cols">
+      <div>
+        <h2>F1NEWS 에프원뉴스</h2>
+        <p style="margin:0">F1과 한국 레이싱 소식을 함께 보는 웹 매거진입니다. 순위 데이터는 2026년 11월 2일(KST) 확인한 공식 페이지 기준입니다.</p>
+      </div>
+      <div>
+        <h2>데이터 출처</h2>
+        <ul>
+          <li><a href="https://www.formula1.com/en/results/2026/drivers" target="_blank" rel="noopener noreferrer">formula1.com 드라이버 순위</a></li>
+          <li><a href="https://www.formula1.com/en/results/2026/team" target="_blank" rel="noopener noreferrer">formula1.com 팀 순위</a></li>
+          <li><a href="https://www.formula1.com/en/results/2026/races" target="_blank" rel="noopener noreferrer">formula1.com 레이스 결과</a></li>
+          <li><a href="https://www.formula1.com/en/racing/2026" target="_blank" rel="noopener noreferrer">formula1.com 2026 캘린더</a></li>
+          <li><a href="https://www.espn.com/f1/story/_/id/50250037/kimi-antonelli-youngest-f1-world-champion-2026-mexico-city-grand-prix" target="_blank" rel="noopener noreferrer">ESPN 안토넬리 챔피언 기사</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="legal">F1NEWS는 독립 매거진이며 Formula 1의 공식 서비스가 아닙니다. F1, FORMULA 1, 관련 상표는 Formula One Licensing BV의 자산입니다. 드라이버·팀 한글 표기는 편집부 기준이며 공식 표기와 다를 수 있습니다.</p>
+  </div>
+</footer>
+<script>
+(function(){
+  var $=function(s,r){return (r||document).querySelector(s)};
+  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+
+  // standings tabs
+  var tabs=$$('.tab');
+  tabs.forEach(function(t){t.addEventListener('click',function(){
+    tabs.forEach(function(x){var on=x===t;x.setAttribute('aria-selected',on);$('#'+x.getAttribute('aria-controls')).hidden=!on});
+  })});
+
+  // race winner filter
+  var wc=$$('[data-win]',$('#win-chips'));
+  wc.forEach(function(c){c.addEventListener('click',function(){
+    wc.forEach(function(x){x.setAttribute('aria-pressed',x===c)});
+    var k=c.getAttribute('data-win');
+    $$('.race').forEach(function(r){r.hidden=!(k==='all'||r.getAttribute('data-win')===k)});
+  })});
+
+  // decade filter
+  var dc=$$('[data-dec]',$('#dec-chips'));
+  dc.forEach(function(c){c.addEventListener('click',function(){
+    dc.forEach(function(x){x.setAttribute('aria-pressed',x===c)});
+    var k=c.getAttribute('data-dec');
+    $$('#champ-body tr').forEach(function(r){r.hidden=r.getAttribute('data-dec')!==k});
+  })});
+
+  // D-day to the next race weekend (Sao Paulo, 6 Nov 2026)
+  try{
+    var n=new Date(),t=new Date(2026,10,6),s=new Date(n.getFullYear(),n.getMonth(),n.getDate());
+    var d=Math.round((t-s)/864e5),el=$('#dday');
+    if(el){
+      if(d>0)el.innerHTML='D-'+d+'<small>일 남음</small>';
+      else if(d>=-2)el.innerHTML='레이스 위크<small>진행 중</small>';
+      else el.innerHTML='종료<small>다음 일정을 확인하세요</small>';
+    }
+  }catch(e){}
+
+  // scroll spy
+  try{
+    var links=$$('.nav a'),map={};
+    links.forEach(function(a){map[a.getAttribute('href').slice(1)]=a});
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){if(e.isIntersecting){
+        links.forEach(function(a){a.removeAttribute('aria-current')});
+        var a=map[e.target.id];if(a)a.setAttribute('aria-current','true');
+      }});
+    },{rootMargin:'-30% 0px -60% 0px'});
+    Object.keys(map).forEach(function(id){var s=document.getElementById(id);if(s)io.observe(s)});
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
